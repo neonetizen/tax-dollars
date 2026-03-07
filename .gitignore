@@ -49,4 +49,5 @@ my-tax-dollars-architecture-plan.md
 .claude/
 
 .env.local
-public/data/
+# large data files — seed via scripts/seed-supabase.ts instead
+public/data/*.csv

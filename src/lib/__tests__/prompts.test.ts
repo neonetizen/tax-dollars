@@ -47,29 +47,9 @@ describe("buildVerdictPrompt", () => {
     expect(result.user).toContain("Water Main");
   });
 
-  it("includes neighborhood when provided", () => {
-    const result = buildVerdictPrompt(
-      makeRequest({ neighborhood: "North Park" })
-    );
-    expect(result.user).toContain("North Park");
-  });
-
-  it("includes resolution days when provided", () => {
-    const result = buildVerdictPrompt(
-      makeRequest({ avgResolutionDays: 12.5, cityAvgResolutionDays: 15.0 })
-    );
-    expect(result.user).toContain("12.5 days");
-    expect(result.user).toContain("15 days");
-  });
-
-  it("includes top issues when provided", () => {
-    const result = buildVerdictPrompt(
-      makeRequest({
-        topIssues: [{ service: "Potholes", count: 150 }],
-      })
-    );
-    expect(result.user).toContain("Potholes");
-    expect(result.user).toContain("150 cases");
+  it("includes zip code when provided", () => {
+    const result = buildVerdictPrompt(makeRequest({ zipCode: "92101" }));
+    expect(result.user).toContain("92101");
   });
 
   it("handles no CIP projects gracefully", () => {

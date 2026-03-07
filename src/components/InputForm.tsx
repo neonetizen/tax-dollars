@@ -7,7 +7,7 @@ import type { InputFormProps } from "@/types";
 export function InputForm({ onSubmit }: InputFormProps) {
   const { dispatch } = useAppContext();
   const [valueInput, setValueInput] = useState("");
-  const [zipcodeInput, setZipcodeInput] = useState("");
+  const [zipInput, setZipInput] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -22,9 +22,9 @@ export function InputForm({ onSubmit }: InputFormProps) {
 
     dispatch({
       type: "SET_INPUT",
-      payload: { assessedValue: parsed, zipcode: zipcodeInput },
+      payload: { assessedValue: parsed, zipCode: zipInput.trim() },
     });
-    onSubmit();
+    onSubmit(parsed, zipInput.trim());
   };
 
   return (
@@ -32,18 +32,18 @@ export function InputForm({ onSubmit }: InputFormProps) {
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
           <label
-            htmlFor="zipcode"
+            htmlFor="zipCode"
             className="mb-1.5 block text-sm font-semibold text-sd-navy"
           >
             San Diego ZIP Code
           </label>
           <input
-            id="zipcode"
+            id="zipCode"
             type="text"
             inputMode="numeric"
             maxLength={5}
-            value={zipcodeInput}
-            onChange={(e) => setZipcodeInput(e.target.value.replace(/\D/g, ""))}
+            value={zipInput}
+            onChange={(e) => setZipInput(e.target.value.replace(/\D/g, ""))}
             placeholder="e.g. 92101"
             className="w-full rounded-lg border border-gray-200 bg-sd-bg px-4 py-3 text-lg text-sd-navy transition-all placeholder:text-sd-text-muted/50 focus:border-sd-blue focus:bg-white focus:outline-none focus:ring-2 focus:ring-sd-blue/25"
           />
