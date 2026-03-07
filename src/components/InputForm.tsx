@@ -18,7 +18,7 @@ export function InputForm({ onSubmit }: InputFormProps) {
       type: "SET_INPUT",
       payload: { assessedValue: parsed, zipCode: zipInput.trim() },
     });
-    onSubmit();
+    onSubmit(parsed, zipInput.trim());
   };
 
   return (

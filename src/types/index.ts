@@ -92,7 +92,7 @@ export type AppAction =
 // -----------------------------------------------------------------------------
 
 export interface InputFormProps {
-  onSubmit: () => void;
+  onSubmit: (assessedValue: number, zipcode: string) => void;
 }
 
 export interface DepartmentChartProps {

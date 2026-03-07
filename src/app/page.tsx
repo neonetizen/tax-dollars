@@ -11,68 +11,86 @@ function AppContent() {
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptLoading, setReceiptLoading] = useState(false);
 
-  const handleCalculate = useCallback(async () => {
-    const { input } = state;
-    if (!input.assessedValue) return;
+  const handleCalculate = useCallback(
+    async (assessedValue: number, zipCode: string) => {
+      if (!assessedValue) return;
 
-    setReceiptLoading(true);
-    setShowReceipt(false);
+      setReceiptLoading(true);
+      setShowReceipt(false);
+      dispatch({ type: "SET_ERROR", payload: "" });
 
-    try {
-      const res = await fetch("/api/tax-receipt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          assessedValue: input.assessedValue,
-          zipCode: input.zipCode || undefined,
-        }),
-      });
+      try {
+        const res = await fetch("/api/tax-receipt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            assessedValue,
+            zipCode: zipCode || undefined,
+          }),
+        });
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          dispatch({
+            type: "SET_ERROR",
+            payload:
+              (err as { error?: string }).error ??
+              "Failed to load receipt data",
+          });
+          return;
+        }
+
+        const receiptData: TaxReceiptResponse = await res.json();
+        dispatch({ type: "SET_RECEIPT_DATA", payload: receiptData });
+        setShowReceipt(true);
+
+        dispatch({ type: "SET_VERDICT_LOADING", payload: true });
+
+        const verdictReq: VerdictRequest = {
+          assessedValue,
+          cityContribution: receiptData.breakdown.cityContribution,
+          deptBreakdown: receiptData.breakdown.departments,
+          cipProjects: receiptData.cipProjects.slice(0, 20),
+          zipCode: zipCode || undefined,
+        };
+
+        const verdictRes = await fetch("/api/verdict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(verdictReq),
+        });
+
+        if (!verdictRes.ok) {
+          const errData = await verdictRes.json().catch(() => ({}));
+          dispatch({
+            type: "SET_VERDICT",
+            payload:
+              (errData as { error?: string }).error ??
+              "Unable to generate verdict.",
+          });
+          return;
+        }
+
+        const verdictData: { verdict?: string; error?: string } =
+          await verdictRes.json();
+        dispatch({
+          type: "SET_VERDICT",
+          payload:
+            verdictData.verdict ||
+            verdictData.error ||
+            "Unable to generate verdict.",
+        });
+      } catch {
         dispatch({
           type: "SET_ERROR",
-          payload: err.error ?? "Failed to load receipt data",
+          payload: "Unable to generate receipt. Please try again.",
         });
-        return;
+      } finally {
+        setReceiptLoading(false);
       }
-
-      const receiptData: TaxReceiptResponse = await res.json();
-      dispatch({ type: "SET_RECEIPT_DATA", payload: receiptData });
-      setShowReceipt(true);
-
-      dispatch({ type: "SET_VERDICT_LOADING", payload: true });
-
-      const verdictReq: VerdictRequest = {
-        assessedValue: input.assessedValue,
-        cityContribution: receiptData.breakdown.cityContribution,
-        deptBreakdown: receiptData.breakdown.departments,
-        cipProjects: receiptData.cipProjects.slice(0, 20),
-        zipCode: input.zipCode || undefined,
-      };
-
-      const verdictRes = await fetch("/api/verdict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(verdictReq),
-      });
-      const verdictData = await verdictRes.json();
-      dispatch({
-        type: "SET_VERDICT",
-        payload:
-          verdictData.verdict ||
-          verdictData.error ||
-          "Unable to generate verdict.",
-      });
-    } catch {
-      dispatch({
-        type: "SET_ERROR",
-        payload: "Unable to generate receipt. Please try again.",
-      });
-    } finally {
-      setReceiptLoading(false);
-    }
-  }, [state, dispatch]);
+    },
+    [dispatch]
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-12">
