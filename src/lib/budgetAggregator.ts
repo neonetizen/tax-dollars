@@ -1,9 +1,9 @@
 interface BudgetRow {
-  fiscal_year: number | string;
-  fund_type: string;
-  department_name: string;
-  account_type: string;
   amount: number | string;
+  report_fy: number | string;
+  fund_type: string;
+  dept_name: string;
+  account_number: number | string;
   [key: string]: unknown;
 }
 
@@ -13,10 +13,13 @@ interface BudgetResult {
   fiscalYear: string;
 }
 
+function isExpenseAccount(accountNumber: string | number): boolean {
+  return String(accountNumber).startsWith("5");
+}
+
 export function aggregateBudget(rows: BudgetRow[]): BudgetResult {
-  // Find the latest complete fiscal year
   const fiscalYears = [
-    ...new Set(rows.map((r) => String(r.fiscal_year))),
+    ...new Set(rows.map((r) => String(r.report_fy))),
   ].sort();
   const latestFY = fiscalYears[fiscalYears.length - 1];
 
@@ -25,9 +28,9 @@ export function aggregateBudget(rows: BudgetRow[]): BudgetResult {
 
   for (const row of rows) {
     if (
-      String(row.fiscal_year) !== latestFY ||
+      String(row.report_fy) !== latestFY ||
       !String(row.fund_type).toLowerCase().includes("general") ||
-      !String(row.account_type).toLowerCase().includes("expense")
+      !isExpenseAccount(row.account_number)
     ) {
       continue;
     }
@@ -39,7 +42,7 @@ export function aggregateBudget(rows: BudgetRow[]): BudgetResult {
 
     if (isNaN(amount)) continue;
 
-    const dept = row.department_name?.trim() || "Unknown";
+    const dept = row.dept_name?.trim() || "Unknown";
     departmentSpendMap.set(dept, (departmentSpendMap.get(dept) || 0) + amount);
     totalGeneralFundSpend += amount;
   }
