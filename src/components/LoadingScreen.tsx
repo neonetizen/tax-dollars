@@ -4,7 +4,6 @@ import type { LoadingScreenProps } from "@/types";
 
 const DATASET_LABELS: Record<string, string> = {
   budget: "Budget data",
-  neighborhood: "311 data",
   cip: "CIP data",
 };
 

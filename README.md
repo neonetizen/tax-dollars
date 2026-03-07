@@ -15,15 +15,15 @@
 
 ## Problem Statement
 
-San Diego collects property taxes from hundreds of thousands of homeowners every year, but residents have almost no intuitive way to understand what they're actually funding. Budget documents are dense, portals are hard to navigate, and aggregate statistics obscure neighborhood-level reality. The result: taxpayers pay without any meaningful sense of what they got in return.
+San Diego collects property taxes from hundreds of thousands of homeowners every year, but residents have almost no intuitive way to understand what they're actually funding. Budget documents are dense, portals are hard to navigate, and aggregate statistics obscure how money is allocated. The result: taxpayers pay without any meaningful sense of what they got in return.
 
-**My Tax Dollars** reframes the question. Instead of "here is the city budget," it asks: "you paid X dollars — here is your receipt, and here is what was actually delivered."
+**My Tax Dollars** reframes the question. Instead of "here is the city budget," it asks: "you paid X dollars — here is your receipt."
 
 ---
 
 ## What It Does
 
-A San Diego homeowner enters their property's assessed value. The app calculates their approximate annual property tax contribution and breaks it down by city department (public safety, parks, libraries, roads, etc.). It then pulls real, current service delivery data for their neighborhood from San Diego's open datasets — think pothole repairs completed, 311 response times, code enforcement cases closed. Finally, it hands that combined picture to Claude, which renders a plain-English "value for money" verdict: what you paid for, and what the city actually delivered.
+A San Diego homeowner enters their property's assessed value. The app calculates their approximate annual property tax contribution and breaks it down by city department (public safety, parks, libraries, roads, etc.) and capital improvement projects. Finally, it hands that combined picture to Claude, which renders a plain-English "tax receipt verdict" explaining where the money went.
 
 The whole experience is a single page. No account required. No backend. Just a number in, a receipt out.
 
@@ -34,10 +34,7 @@ The whole experience is a single page. No account required. No backend. Just a n
 | Source | What It Provides |
 |--------|-----------------|
 | [San Diego County Assessor](https://www.sandiegocounty.gov/content/sdc/assessor.html) | Property assessed value baseline and tax rate calculation |
-| [City of San Diego Open Data Portal](https://data.sandiego.gov) | Neighborhood-level service delivery datasets |
-| [Get It Done (311) Dataset](https://data.sandiego.gov/datasets/get-it-done-311/) | Request volume and resolution times by neighborhood |
-| [Street Division Services](https://data.sandiego.gov/datasets/streets-potholes/) | Pothole and road repair activity |
-| [Code Enforcement Cases](https://data.sandiego.gov/datasets/code-enforcement-cases/) | Code enforcement activity by address/neighborhood |
+| [City of San Diego Open Data Portal](https://data.sandiego.gov) | Operating budget actuals and capital improvement project data |
 | [San Diego Fiscal Year Budget](https://www.sandiego.gov/finance/budget) | Department-level spending allocations used to weight tax breakdowns |
 
 ---
@@ -49,29 +46,24 @@ User Input (assessed value)
         |
         v
 Tax Calculator
-  - Applies CA base rate (1%) + local overrides
+  - Applies CA base rate (1%) + city share (~18%)
   - Allocates contribution by department using budget weights
         |
         v
-Neighborhood Data Fetcher
-  - Queries San Diego Open Data Portal (Socrata API, no auth required)
-  - Pulls 311, road repair, and code enforcement records for user's area
-        |
-        v
 Claude API
-  - Receives tax breakdown + service delivery data as context
-  - Returns a plain-English "value for money" verdict
+  - Receives tax breakdown + CIP data as context
+  - Returns a plain-English "tax receipt verdict"
         |
         v
 Receipt UI (React, single page)
   - Renders line-item tax breakdown
-  - Renders neighborhood service stats
+  - Renders capital improvement projects
   - Renders Claude's verdict
 ```
 
-**Stack:** React, Vite, Tailwind CSS, Anthropic Claude API (client-side via user-supplied key or proxied), San Diego Socrata Open Data API.
+**Stack:** Next.js 14+ App Router, TypeScript, Tailwind CSS, PapaParse, Recharts, Anthropic Claude API.
 
-**Deployment:** Vercel (free tier). No backend required — all data sources are public and unauthenticated.
+**Deployment:** Vercel (free tier). No backend required beyond the thin API route for Claude.
 
 ---
 

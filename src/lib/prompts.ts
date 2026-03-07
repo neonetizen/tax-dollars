@@ -24,24 +24,8 @@ export function buildVerdictPrompt(req: VerdictRequest): {
     `Estimated city contribution: $${req.cityContribution.toFixed(2)}.`,
     `Department breakdown: ${topDepts}.`,
     `Top capital improvement projects: ${cipList}.`,
+    "Write the verdict.",
   ];
-
-  if (req.neighborhood) {
-    parts.push(`Neighborhood: ${req.neighborhood}.`);
-  }
-  if (req.avgResolutionDays != null) {
-    parts.push(
-      `Average 311 resolution time: ${req.avgResolutionDays} days (city average: ${req.cityAvgResolutionDays ?? "N/A"} days).`
-    );
-  }
-  if (req.topIssues && req.topIssues.length > 0) {
-    const issues = req.topIssues
-      .map((i) => `${i.service} (${i.count} cases)`)
-      .join("; ");
-    parts.push(`Top issues reported: ${issues}.`);
-  }
-
-  parts.push("Write the verdict.");
 
   return { system: SYSTEM_PROMPT, user: parts.join(" ") };
 }

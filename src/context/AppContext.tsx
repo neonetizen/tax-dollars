@@ -13,19 +13,14 @@ const initialState: AppState = {
   loading: { budget: true, cip: true },
   error: null,
   budgetData: null,
-  neighborhoodData: null,
   cipData: null,
-  neighborhoodsList: [],
   totalGeneralFundSpend: 0,
   input: {
     assessedValue: 0,
-    neighborhood: "",
-    comparisonNeighborhood: "",
   },
   taxBreakdown: null,
   verdict: null,
   verdictLoading: false,
-  comparisonMode: false,
 };
 
 function appReducer(state: AppState, action: AppAction): AppState {
@@ -47,12 +42,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
           0
         ),
       };
-    case "SET_NEIGHBORHOOD_DATA":
-      return { ...state, neighborhoodData: action.payload };
     case "SET_CIP_DATA":
       return { ...state, cipData: action.payload };
-    case "SET_NEIGHBORHOODS_LIST":
-      return { ...state, neighborhoodsList: action.payload };
     case "SET_ERROR":
       return { ...state, error: action.payload };
     case "SET_INPUT":
@@ -61,8 +52,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, verdict: action.payload, verdictLoading: false };
     case "SET_VERDICT_LOADING":
       return { ...state, verdictLoading: action.payload };
-    case "TOGGLE_COMPARISON":
-      return { ...state, comparisonMode: !state.comparisonMode };
     case "SET_TAX_BREAKDOWN":
       return { ...state, taxBreakdown: action.payload };
     default:
