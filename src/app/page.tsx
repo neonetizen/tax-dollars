@@ -119,38 +119,40 @@ function AppContent() {
   }, [state, dispatch]);
 
   return (
-    <div className="min-h-screen bg-sd-bg">
+    <div className="flex min-h-screen flex-col bg-sd-bg">
       <HeroHeader />
 
-      <main className="mx-auto max-w-4xl px-4 py-10">
-        {phase === "loading" && (
-          <LoadingScreen loading={state.loading} />
-        )}
+      <main className="mx-auto flex w-full max-w-4xl flex-1 items-center px-4 py-10">
+        <div className="w-full">
+          {phase === "loading" && (
+            <LoadingScreen loading={state.loading} />
+          )}
 
-        {phase === "input" && (
-          <div className="-mt-8 rounded-2xl bg-white p-6 shadow-xl sm:p-8">
-            {errorMsg && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-                {errorMsg}
-              </div>
-            )}
-            <InputForm onSubmit={handleCalculate} />
-          </div>
-        )}
-
-        {phase === "receipt" && (
-          <div className="-mt-8">
-            <TaxReceipt />
-            <div className="mt-8 text-center">
-              <button
-                onClick={() => setPhase("input")}
-                className="rounded-lg border border-sd-blue/20 bg-white px-6 py-2.5 text-sm font-semibold text-sd-blue shadow-sm transition-all hover:bg-sd-bg hover:shadow-md"
-              >
-                Calculate Again
-              </button>
+          {phase === "input" && (
+            <div className="rounded-2xl bg-white p-6 shadow-xl sm:p-8">
+              {errorMsg && (
+                <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                  {errorMsg}
+                </div>
+              )}
+              <InputForm onSubmit={handleCalculate} />
             </div>
-          </div>
-        )}
+          )}
+
+          {phase === "receipt" && (
+            <>
+              <TaxReceipt />
+              <div className="mt-8 text-center">
+                <button
+                  onClick={() => setPhase("input")}
+                  className="rounded-lg border border-sd-blue/20 bg-white px-6 py-2.5 text-sm font-semibold text-sd-blue shadow-sm transition-all hover:bg-sd-bg hover:shadow-md"
+                >
+                  Calculate Again
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </main>
     </div>
   );
