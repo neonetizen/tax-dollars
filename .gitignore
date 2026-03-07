@@ -47,6 +47,7 @@ rules/
 skills/
 my-tax-dollars-architecture-plan.md
 .claude/
+MARKETING_PLAN.md
 
 .env.local
 # large data files — seed via scripts/seed-supabase.ts instead
