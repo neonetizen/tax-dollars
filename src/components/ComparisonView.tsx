@@ -3,8 +3,9 @@
 import { useAppContext } from "@/context/AppContext";
 import { NeighborhoodCard } from "./NeighborhoodCard";
 import { VerdictPanel } from "./VerdictPanel";
+import type { ComparisonViewProps } from "@/types";
 
-export function ComparisonView({ cityAvgDays }: { cityAvgDays: number }) {
+export function ComparisonView({ cityAvgDays }: ComparisonViewProps) {
   const { state } = useAppContext();
   const { neighborhoodData, input } = state;
 

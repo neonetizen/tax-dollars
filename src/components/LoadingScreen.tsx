@@ -1,8 +1,6 @@
 "use client";
 
-interface LoadingScreenProps {
-  loading: Record<string, boolean>;
-}
+import type { LoadingScreenProps } from "@/types";
 
 const DATASET_LABELS: Record<string, string> = {
   budget: "Budget data",

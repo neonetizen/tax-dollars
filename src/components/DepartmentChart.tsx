@@ -1,6 +1,6 @@
 "use client";
 
-import type { DepartmentSpend } from "@/types";
+import type { DepartmentChartProps } from "@/types";
 import {
   BarChart,
   Bar,
@@ -22,10 +22,6 @@ const COLORS = [
   "#0891b2",
   "#65a30d",
 ];
-
-interface DepartmentChartProps {
-  departments: DepartmentSpend[];
-}
 
 export function DepartmentChart({ departments }: DepartmentChartProps) {
   const top8 = departments.slice(0, 8);

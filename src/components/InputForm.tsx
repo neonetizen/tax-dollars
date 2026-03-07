@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useAppContext } from "@/context/AppContext";
+import type { InputFormProps } from "@/types";
 
-export function InputForm({ onSubmit }: { onSubmit: () => void }) {
+export function InputForm({ onSubmit }: InputFormProps) {
   const { state, dispatch } = useAppContext();
   const [valueInput, setValueInput] = useState("");
 

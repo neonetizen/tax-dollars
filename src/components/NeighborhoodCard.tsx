@@ -1,11 +1,6 @@
 "use client";
 
-import type { NeighborhoodStats } from "@/types";
-
-interface NeighborhoodCardProps {
-  stats: NeighborhoodStats;
-  cityAvgDays?: number;
-}
+import type { NeighborhoodCardProps } from "@/types";
 
 function getGrade(avgDays: number, cityAvg: number): string {
   const ratio = avgDays / cityAvg;
