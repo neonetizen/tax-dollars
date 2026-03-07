@@ -2,17 +2,14 @@
 
 import { useAppContext } from "@/context/AppContext";
 import { DepartmentChart } from "./DepartmentChart";
-import { NeighborhoodCard } from "./NeighborhoodCard";
 import { VerdictPanel } from "./VerdictPanel";
 import { Disclaimer } from "./Disclaimer";
 
 export function TaxReceipt() {
   const { state } = useAppContext();
-  const { taxBreakdown, neighborhoodData, input } = state;
+  const { taxBreakdown } = state;
 
   if (!taxBreakdown) return null;
-
-  const neighborhoodStats = neighborhoodData?.get(input.neighborhood);
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
@@ -43,10 +40,6 @@ export function TaxReceipt() {
       </div>
 
       <DepartmentChart departments={taxBreakdown.departments} />
-
-      {neighborhoodStats && (
-        <NeighborhoodCard stats={neighborhoodStats} />
-      )}
 
       <VerdictPanel />
       <Disclaimer />

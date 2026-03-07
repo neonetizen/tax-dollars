@@ -1,26 +1,23 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { AppProvider, useAppContext } from "@/context/AppContext";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { InputForm } from "@/components/InputForm";
 import { TaxReceipt } from "@/components/TaxReceipt";
 import { aggregateBudget } from "@/lib/budgetAggregator";
-import { aggregateNeighborhoods } from "@/lib/neighborhoodAggregator";
-import { aggregateCIP, getCIPProjectsForNeighborhood } from "@/lib/cipAggregator";
+import { aggregateCIP, getAllCIPProjects } from "@/lib/cipAggregator";
 import { calculateTaxBreakdown } from "@/lib/taxCalculator";
 import type { VerdictRequest } from "@/types";
 import Papa from "papaparse";
 
 const DATA_URLS = {
-  budget: "/data/operating_actuals_datasd.csv",
-  neighborhood: "/data/get_it_done_requests_closed_2025_datasd.csv",
-  cip: "/data/capital_actuals_ptd_datasd.csv",
+  budget: "/data/actuals_operating_datasd.csv",
+  cip: "/data/budget_capital_fy_datasd.csv",
 };
 
 function AppContent() {
   const { state, dispatch } = useAppContext();
-  const [cityAvgDays, setCityAvgDays] = useState(0);
   const [showReceipt, setShowReceipt] = useState(false);
 
   const allLoaded = !Object.values(state.loading).some(Boolean);
@@ -40,11 +37,9 @@ function AppContent() {
     const loadAll = async () => {
       const results = await Promise.allSettled([
         fetchCSV(DATA_URLS.budget),
-        fetchCSV(DATA_URLS.neighborhood),
         fetchCSV(DATA_URLS.cip),
       ]);
 
-      // Budget
       if (results[0].status === "fulfilled") {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { departmentSpendMap } = aggregateBudget(results[0].value as any[]);
@@ -54,22 +49,9 @@ function AppContent() {
       }
       dispatch({ type: "SET_LOADING", payload: { dataset: "budget", loading: false } });
 
-      // Neighborhood (311)
       if (results[1].status === "fulfilled") {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { neighborhoodMap, neighborhoodsList, cityAvgResolutionDays } = aggregateNeighborhoods(results[1].value as any[]);
-        dispatch({ type: "SET_NEIGHBORHOOD_DATA", payload: neighborhoodMap });
-        dispatch({ type: "SET_NEIGHBORHOODS_LIST", payload: neighborhoodsList });
-        setCityAvgDays(cityAvgResolutionDays);
-      } else {
-        dispatch({ type: "SET_ERROR", payload: "Failed to load 311 data" });
-      }
-      dispatch({ type: "SET_LOADING", payload: { dataset: "neighborhood", loading: false } });
-
-      // CIP
-      if (results[2].status === "fulfilled") {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const cipMap = aggregateCIP(results[2].value as any[]);
+        const cipMap = aggregateCIP(results[1].value as any[]);
         dispatch({ type: "SET_CIP_DATA", payload: cipMap });
       } else {
         dispatch({ type: "SET_ERROR", payload: "Failed to load CIP data" });
@@ -81,39 +63,23 @@ function AppContent() {
   }, [dispatch]);
 
   const handleCalculate = useCallback(async () => {
-    const { budgetData, neighborhoodData, cipData, totalGeneralFundSpend, input } = state;
-    if (!budgetData || !neighborhoodData || !input.assessedValue || !input.neighborhood) return;
+    const { budgetData, cipData, totalGeneralFundSpend, input } = state;
+    if (!budgetData || !input.assessedValue) return;
 
     const breakdown = calculateTaxBreakdown(input.assessedValue, budgetData, totalGeneralFundSpend);
     dispatch({ type: "SET_TAX_BREAKDOWN", payload: breakdown });
     setShowReceipt(true);
 
-    // Request verdict from Claude
-    const neighborhoodStats = neighborhoodData.get(input.neighborhood);
-    if (!neighborhoodStats) return;
-
     const cipProjects = cipData
-      ? getCIPProjectsForNeighborhood(cipData, input.neighborhood)
+      ? getAllCIPProjects(cipData).slice(0, 20)
       : [];
 
     const verdictReq: VerdictRequest = {
       assessedValue: input.assessedValue,
       cityContribution: breakdown.cityContribution,
-      neighborhood: input.neighborhood,
       deptBreakdown: breakdown.departments,
-      avgResolutionDays: neighborhoodStats.avgResolutionDays,
-      cityAvgResolutionDays: cityAvgDays,
-      topIssues: neighborhoodStats.topServices,
       cipProjects,
     };
-
-    if (state.comparisonMode && input.comparisonNeighborhood) {
-      verdictReq.comparisonNeighborhood = input.comparisonNeighborhood;
-      verdictReq.comparisonStats = neighborhoodData.get(input.comparisonNeighborhood);
-      verdictReq.comparisonCipProjects = cipData
-        ? getCIPProjectsForNeighborhood(cipData, input.comparisonNeighborhood)
-        : [];
-    }
 
     dispatch({ type: "SET_VERDICT_LOADING", payload: true });
 
@@ -128,7 +94,7 @@ function AppContent() {
     } catch {
       dispatch({ type: "SET_VERDICT", payload: "Unable to generate verdict. Please try again." });
     }
-  }, [state, cityAvgDays, dispatch]);
+  }, [state, dispatch]);
 
   if (!allLoaded) {
     return <LoadingScreen loading={state.loading} />;

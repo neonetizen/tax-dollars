@@ -10,7 +10,7 @@ import {
 import type { AppState, AppAction } from "@/types";
 
 const initialState: AppState = {
-  loading: { budget: true, neighborhood: true, cip: true },
+  loading: { budget: true, cip: true },
   error: null,
   budgetData: null,
   neighborhoodData: null,

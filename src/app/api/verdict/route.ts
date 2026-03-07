@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import type { VerdictRequest } from "@/types";
-import {
-  buildSingleVerdictPrompt,
-  buildComparisonVerdictPrompt,
-} from "@/lib/prompts";
+import { buildVerdictPrompt } from "@/lib/prompts";
 
 const anthropic = new Anthropic();
 
@@ -12,10 +9,7 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as VerdictRequest;
 
-    const isComparison = !!body.comparisonNeighborhood && !!body.comparisonStats;
-    const { system, user } = isComparison
-      ? buildComparisonVerdictPrompt(body)
-      : buildSingleVerdictPrompt(body);
+    const { system, user } = buildVerdictPrompt(body);
 
     const message = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",

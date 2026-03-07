@@ -1,67 +1,70 @@
 import type { CIPProject } from "@/types";
-import { DISTRICT_TO_NEIGHBORHOODS } from "./districtMap";
 
 interface CIPRow {
-  project_title: string;
-  asset_owning_dept: string;
   amount: number | string;
-  council_district: number | string;
+  project_number: string;
+  report_fy: number | string;
+  budget_cycle: string;
+  fund_type: string;
+  asset_owning_dept: string;
+  project_name: string;
   [key: string]: unknown;
 }
 
-export function aggregateCIP(
-  rows: CIPRow[]
-): Map<number, CIPProject[]> {
-  const districtMap = new Map<number, CIPProject[]>();
+export function aggregateCIP(rows: CIPRow[]): Map<string, CIPProject[]> {
+  const deptMap = new Map<string, CIPProject[]>();
+
+  const fiscalYears = [...new Set(rows.map((r) => String(r.report_fy)))].sort();
+  const latestFY = fiscalYears[fiscalYears.length - 1];
 
   for (const row of rows) {
-    const district =
-      typeof row.council_district === "string"
-        ? parseInt(row.council_district, 10)
-        : row.council_district;
-
-    if (isNaN(district) || district < 1 || district > 9) continue;
+    if (String(row.report_fy) !== latestFY) continue;
+    if (String(row.budget_cycle).toLowerCase() !== "adopted") continue;
 
     const amount =
       typeof row.amount === "string"
         ? parseFloat(row.amount.replace(/,/g, ""))
         : row.amount;
 
-    if (isNaN(amount)) continue;
+    if (isNaN(amount) || amount <= 0) continue;
+
+    const dept = String(row.asset_owning_dept || "Unknown").trim();
 
     const project: CIPProject = {
-      projectTitle: String(row.project_title || "Untitled Project").trim(),
-      assetOwningDept: String(row.asset_owning_dept || "Unknown").trim(),
+      projectName: String(row.project_name || "Untitled Project").trim(),
+      projectNumber: String(row.project_number || "").trim(),
+      assetOwningDept: dept,
       amount,
-      councilDistrict: district,
+      fundType: String(row.fund_type || "").trim(),
+      reportFY: String(row.report_fy),
     };
 
-    if (!districtMap.has(district)) {
-      districtMap.set(district, []);
+    if (!deptMap.has(dept)) {
+      deptMap.set(dept, []);
     }
-    districtMap.get(district)!.push(project);
+    deptMap.get(dept)!.push(project);
   }
 
-  // Sort projects within each district by amount descending
-  for (const projects of districtMap.values()) {
+  for (const projects of deptMap.values()) {
     projects.sort((a, b) => b.amount - a.amount);
   }
 
-  return districtMap;
+  return deptMap;
 }
 
-export function getCIPProjectsForNeighborhood(
-  cipData: Map<number, CIPProject[]>,
-  neighborhood: string
+export function getCIPProjectsForDept(
+  cipData: Map<string, CIPProject[]>,
+  department: string
 ): CIPProject[] {
-  for (const [district, neighborhoods] of DISTRICT_TO_NEIGHBORHOODS) {
-    if (
-      neighborhoods.some(
-        (n) => n.toLowerCase() === neighborhood.toLowerCase()
-      )
-    ) {
-      return cipData.get(district) || [];
-    }
+  return cipData.get(department) || [];
+}
+
+export function getAllCIPProjects(
+  cipData: Map<string, CIPProject[]>
+): CIPProject[] {
+  const all: CIPProject[] = [];
+  for (const projects of cipData.values()) {
+    all.push(...projects);
   }
-  return [];
+  return all.sort((a, b) => b.amount - a.amount);
 }

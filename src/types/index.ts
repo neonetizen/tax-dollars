@@ -30,10 +30,12 @@ export interface NeighborhoodStats {
 }
 
 export interface CIPProject {
-  projectTitle: string;
+  projectName: string;
+  projectNumber: string;
   assetOwningDept: string;
   amount: number;
-  councilDistrict: number;
+  fundType: string;
+  reportFY: string;
 }
 
 // -----------------------------------------------------------------------------
@@ -54,12 +56,12 @@ export interface TaxBreakdown {
 export interface VerdictRequest {
   assessedValue: number;
   cityContribution: number;
-  neighborhood: string;
   deptBreakdown: DepartmentSpend[];
-  avgResolutionDays: number;
-  cityAvgResolutionDays: number;
-  topIssues: ServiceCategory[];
   cipProjects: CIPProject[];
+  neighborhood?: string;
+  avgResolutionDays?: number;
+  cityAvgResolutionDays?: number;
+  topIssues?: ServiceCategory[];
   comparisonNeighborhood?: string;
   comparisonStats?: NeighborhoodStats;
   comparisonCipProjects?: CIPProject[];
@@ -90,7 +92,7 @@ export interface AppState {
 
   budgetData: Map<string, number> | null;
   neighborhoodData: Map<string, NeighborhoodStats> | null;
-  cipData: Map<number, CIPProject[]> | null;
+  cipData: Map<string, CIPProject[]> | null;
   neighborhoodsList: string[];
   totalGeneralFundSpend: number;
 
@@ -110,7 +112,7 @@ export type AppAction =
   | { type: "SET_LOADING"; payload: { dataset: string; loading: boolean } }
   | { type: "SET_BUDGET_DATA"; payload: Map<string, number> }
   | { type: "SET_NEIGHBORHOOD_DATA"; payload: Map<string, NeighborhoodStats> }
-  | { type: "SET_CIP_DATA"; payload: Map<number, CIPProject[]> }
+  | { type: "SET_CIP_DATA"; payload: Map<string, CIPProject[]> }
   | { type: "SET_NEIGHBORHOODS_LIST"; payload: string[] }
   | { type: "SET_ERROR"; payload: string }
   | { type: "SET_INPUT"; payload: Partial<AppInput> }
