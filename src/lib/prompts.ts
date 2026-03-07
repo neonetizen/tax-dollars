@@ -20,12 +20,13 @@ export function buildVerdictPrompt(req: VerdictRequest): {
       : "No CIP data available";
 
   const parts = [
+    req.zipCode ? `ZIP code: ${req.zipCode}.` : null,
     `Assessed value: $${req.assessedValue.toLocaleString()}.`,
     `Estimated city contribution: $${req.cityContribution.toFixed(2)}.`,
     `Department breakdown: ${topDepts}.`,
     `Top capital improvement projects: ${cipList}.`,
     "Write the verdict.",
-  ];
+  ].filter(Boolean);
 
   return { system: SYSTEM_PROMPT, user: parts.join(" ") };
 }

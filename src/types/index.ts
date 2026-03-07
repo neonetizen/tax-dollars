@@ -3,7 +3,7 @@
 // =============================================================================
 
 // -----------------------------------------------------------------------------
-// Domain Data (produced by aggregators in src/lib/)
+// Domain Data
 // -----------------------------------------------------------------------------
 
 export interface DepartmentSpend {
@@ -33,14 +33,20 @@ export interface TaxBreakdown {
 }
 
 // -----------------------------------------------------------------------------
-// Claude API Route (/api/verdict)
+// API Routes
 // -----------------------------------------------------------------------------
+
+export interface TaxReceiptResponse {
+  breakdown: TaxBreakdown;
+  cipProjects: CIPProject[];
+}
 
 export interface VerdictRequest {
   assessedValue: number;
   cityContribution: number;
   deptBreakdown: DepartmentSpend[];
   cipProjects: CIPProject[];
+  zipCode?: string;
 }
 
 export interface VerdictResponse {
@@ -54,6 +60,7 @@ export interface VerdictResponse {
 
 export interface AppInput {
   assessedValue: number;
+  zipCode: string;
 }
 
 // -----------------------------------------------------------------------------
@@ -61,16 +68,10 @@ export interface AppInput {
 // -----------------------------------------------------------------------------
 
 export interface AppState {
-  loading: Record<string, boolean>;
   error: string | null;
-
-  budgetData: Map<string, number> | null;
-  cipData: Map<string, CIPProject[]> | null;
-  totalGeneralFundSpend: number;
-
   input: AppInput;
   taxBreakdown: TaxBreakdown | null;
-
+  cipProjects: CIPProject[];
   verdict: string | null;
   verdictLoading: boolean;
 }
@@ -80,22 +81,15 @@ export interface AppState {
 // -----------------------------------------------------------------------------
 
 export type AppAction =
-  | { type: "SET_LOADING"; payload: { dataset: string; loading: boolean } }
-  | { type: "SET_BUDGET_DATA"; payload: Map<string, number> }
-  | { type: "SET_CIP_DATA"; payload: Map<string, CIPProject[]> }
   | { type: "SET_ERROR"; payload: string }
   | { type: "SET_INPUT"; payload: Partial<AppInput> }
-  | { type: "SET_TAX_BREAKDOWN"; payload: TaxBreakdown }
+  | { type: "SET_RECEIPT_DATA"; payload: TaxReceiptResponse }
   | { type: "SET_VERDICT"; payload: string }
   | { type: "SET_VERDICT_LOADING"; payload: boolean };
 
 // -----------------------------------------------------------------------------
 // Component Props
 // -----------------------------------------------------------------------------
-
-export interface LoadingScreenProps {
-  loading: Record<string, boolean>;
-}
 
 export interface InputFormProps {
   onSubmit: () => void;

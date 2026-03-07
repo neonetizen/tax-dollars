@@ -1,115 +1,78 @@
 "use client";
 
-import { useEffect, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { AppProvider, useAppContext } from "@/context/AppContext";
-import { LoadingScreen } from "@/components/LoadingScreen";
 import { InputForm } from "@/components/InputForm";
 import { TaxReceipt } from "@/components/TaxReceipt";
-import { aggregateBudget } from "@/lib/budgetAggregator";
-import { aggregateCIP, getAllCIPProjects } from "@/lib/cipAggregator";
-import { calculateTaxBreakdown } from "@/lib/taxCalculator";
-import type { VerdictRequest } from "@/types";
-import Papa from "papaparse";
-
-const DATA_URLS = {
-  budget: "/data/actuals_operating_datasd.csv",
-  cip: "/data/budget_capital_fy_datasd.csv",
-};
+import type { TaxReceiptResponse, VerdictRequest } from "@/types";
 
 function AppContent() {
   const { state, dispatch } = useAppContext();
   const [showReceipt, setShowReceipt] = useState(false);
-
-  const allLoaded = !Object.values(state.loading).some(Boolean);
-
-  useEffect(() => {
-    async function fetchCSV(url: string) {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`Failed to fetch ${url}`);
-      const text = await response.text();
-      return Papa.parse(text, {
-        header: true,
-        skipEmptyLines: true,
-        dynamicTyping: true,
-      }).data;
-    }
-
-    const loadAll = async () => {
-      const results = await Promise.allSettled([
-        fetchCSV(DATA_URLS.budget),
-        fetchCSV(DATA_URLS.cip),
-      ]);
-
-      if (results[0].status === "fulfilled") {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { departmentSpendMap } = aggregateBudget(results[0].value as any[]);
-        dispatch({ type: "SET_BUDGET_DATA", payload: departmentSpendMap });
-      } else {
-        dispatch({ type: "SET_ERROR", payload: "Failed to load budget data" });
-      }
-      dispatch({ type: "SET_LOADING", payload: { dataset: "budget", loading: false } });
-
-      if (results[1].status === "fulfilled") {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const cipMap = aggregateCIP(results[1].value as any[]);
-        dispatch({ type: "SET_CIP_DATA", payload: cipMap });
-      } else {
-        dispatch({ type: "SET_ERROR", payload: "Failed to load CIP data" });
-      }
-      dispatch({ type: "SET_LOADING", payload: { dataset: "cip", loading: false } });
-    };
-
-    loadAll();
-  }, [dispatch]);
+  const [receiptLoading, setReceiptLoading] = useState(false);
 
   const handleCalculate = useCallback(async () => {
-    const { budgetData, cipData, totalGeneralFundSpend, input } = state;
-    if (!budgetData || !input.assessedValue) return;
+    const { input } = state;
+    if (!input.assessedValue) return;
 
-    const breakdown = calculateTaxBreakdown(input.assessedValue, budgetData, totalGeneralFundSpend);
-    dispatch({ type: "SET_TAX_BREAKDOWN", payload: breakdown });
-    setShowReceipt(true);
-
-    const cipProjects = cipData
-      ? getAllCIPProjects(cipData).slice(0, 20)
-      : [];
-
-    const verdictReq: VerdictRequest = {
-      assessedValue: input.assessedValue,
-      cityContribution: breakdown.cityContribution,
-      deptBreakdown: breakdown.departments,
-      cipProjects,
-    };
-
-    dispatch({ type: "SET_VERDICT_LOADING", payload: true });
+    setReceiptLoading(true);
+    setShowReceipt(false);
 
     try {
-      const res = await fetch("/api/verdict", {
+      const res = await fetch("/api/tax-receipt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          assessedValue: input.assessedValue,
+          zipCode: input.zipCode || undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        dispatch({
+          type: "SET_ERROR",
+          payload: err.error ?? "Failed to load receipt data",
+        });
+        return;
+      }
+
+      const receiptData: TaxReceiptResponse = await res.json();
+      dispatch({ type: "SET_RECEIPT_DATA", payload: receiptData });
+      setShowReceipt(true);
+
+      dispatch({ type: "SET_VERDICT_LOADING", payload: true });
+
+      const verdictReq: VerdictRequest = {
+        assessedValue: input.assessedValue,
+        cityContribution: receiptData.breakdown.cityContribution,
+        deptBreakdown: receiptData.breakdown.departments,
+        cipProjects: receiptData.cipProjects.slice(0, 20),
+        zipCode: input.zipCode || undefined,
+      };
+
+      const verdictRes = await fetch("/api/verdict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(verdictReq),
       });
-      const data = await res.json();
-      dispatch({ type: "SET_VERDICT", payload: data.verdict || data.error || "Unable to generate verdict." });
+      const verdictData = await verdictRes.json();
+      dispatch({
+        type: "SET_VERDICT",
+        payload:
+          verdictData.verdict ||
+          verdictData.error ||
+          "Unable to generate verdict.",
+      });
     } catch {
-      dispatch({ type: "SET_VERDICT", payload: "Unable to generate verdict. Please try again." });
+      dispatch({
+        type: "SET_ERROR",
+        payload: "Unable to generate receipt. Please try again.",
+      });
+    } finally {
+      setReceiptLoading(false);
     }
   }, [state, dispatch]);
-
-  if (!allLoaded) {
-    return <LoadingScreen loading={state.loading} />;
-  }
-
-  if (state.error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="rounded-lg bg-red-50 p-6 text-red-700">
-          <h2 className="mb-2 text-xl font-bold">Error Loading Data</h2>
-          <p>{state.error}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-12">
@@ -122,9 +85,21 @@ function AppContent() {
         </p>
       </header>
 
+      {state.error && (
+        <div className="mx-auto mb-8 max-w-lg rounded-lg bg-red-50 p-4 text-red-700">
+          {state.error}
+        </div>
+      )}
+
       <InputForm onSubmit={handleCalculate} />
 
-      {showReceipt && (
+      {receiptLoading && (
+        <div className="mt-12 text-center text-gray-500">
+          Loading your receipt…
+        </div>
+      )}
+
+      {showReceipt && !receiptLoading && (
         <div className="mt-12">
           <TaxReceipt />
         </div>

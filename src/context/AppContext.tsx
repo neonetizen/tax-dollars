@@ -10,50 +10,33 @@ import {
 import type { AppState, AppAction } from "@/types";
 
 const initialState: AppState = {
-  loading: { budget: true, cip: true },
   error: null,
-  budgetData: null,
-  cipData: null,
-  totalGeneralFundSpend: 0,
   input: {
     assessedValue: 0,
+    zipCode: "",
   },
   taxBreakdown: null,
+  cipProjects: [],
   verdict: null,
   verdictLoading: false,
 };
 
 function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
-    case "SET_LOADING":
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          [action.payload.dataset]: action.payload.loading,
-        },
-      };
-    case "SET_BUDGET_DATA":
-      return {
-        ...state,
-        budgetData: action.payload,
-        totalGeneralFundSpend: [...action.payload.values()].reduce(
-          (sum, v) => sum + v,
-          0
-        ),
-      };
-    case "SET_CIP_DATA":
-      return { ...state, cipData: action.payload };
     case "SET_ERROR":
       return { ...state, error: action.payload };
     case "SET_INPUT":
       return { ...state, input: { ...state.input, ...action.payload } };
+    case "SET_RECEIPT_DATA":
+      return {
+        ...state,
+        taxBreakdown: action.payload.breakdown,
+        cipProjects: action.payload.cipProjects,
+      };
     case "SET_VERDICT":
       return { ...state, verdict: action.payload, verdictLoading: false };
     case "SET_VERDICT_LOADING":
       return { ...state, verdictLoading: action.payload };
-    case "SET_TAX_BREAKDOWN":
-      return { ...state, taxBreakdown: action.payload };
     default:
       return state;
   }

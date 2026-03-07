@@ -7,13 +7,17 @@ import type { InputFormProps } from "@/types";
 export function InputForm({ onSubmit }: InputFormProps) {
   const { dispatch } = useAppContext();
   const [valueInput, setValueInput] = useState("");
+  const [zipInput, setZipInput] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = parseFloat(valueInput.replace(/[,$]/g, ""));
     if (isNaN(parsed) || parsed < 50000 || parsed > 5000000) return;
 
-    dispatch({ type: "SET_INPUT", payload: { assessedValue: parsed } });
+    dispatch({
+      type: "SET_INPUT",
+      payload: { assessedValue: parsed, zipCode: zipInput.trim() },
+    });
     onSubmit();
   };
 
@@ -38,6 +42,25 @@ export function InputForm({ onSubmit }: InputFormProps) {
         <p className="mt-1 text-sm text-gray-500">
           Enter a value between $50,000 and $5,000,000
         </p>
+      </div>
+
+      <div>
+        <label
+          htmlFor="zipCode"
+          className="mb-2 block text-sm font-medium text-gray-700"
+        >
+          ZIP Code <span className="font-normal text-gray-400">(optional)</span>
+        </label>
+        <input
+          id="zipCode"
+          type="text"
+          inputMode="numeric"
+          value={zipInput}
+          onChange={(e) => setZipInput(e.target.value)}
+          placeholder="e.g. 92101"
+          maxLength={5}
+          className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+        />
       </div>
 
       <button
