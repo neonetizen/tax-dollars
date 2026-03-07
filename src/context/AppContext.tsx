@@ -10,7 +10,7 @@ import {
 import type { AppState, AppAction } from "@/types";
 
 const initialState: AppState = {
-  loading: { budget: true, cip: true },
+  loading: {},
   error: null,
   budgetData: null,
   neighborhoodData: null,
@@ -19,6 +19,7 @@ const initialState: AppState = {
   totalGeneralFundSpend: 0,
   input: {
     assessedValue: 0,
+    zipcode: "",
     neighborhood: "",
     comparisonNeighborhood: "",
   },

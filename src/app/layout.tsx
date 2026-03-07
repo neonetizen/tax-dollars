@@ -28,7 +28,28 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div className="flex min-h-screen flex-col">
+          <div className="flex-1">{children}</div>
+
+          <footer className="border-t border-sd-sky-light/30 bg-sd-navy px-4 py-6 text-sm text-white/70">
+            <div className="mx-auto flex max-w-4xl flex-col items-center gap-2 sm:flex-row sm:justify-between">
+              <p>
+                Built with{" "}
+                <a
+                  href="https://data.sandiego.gov"
+                  className="text-sd-sky underline decoration-sd-sky/40 hover:text-white"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  San Diego Open Data
+                </a>
+              </p>
+              <p className="text-white/50">
+                Estimates only &middot; Not affiliated with the City of San Diego
+              </p>
+            </div>
+          </footer>
+        </div>
       </body>
     </html>
   );

@@ -78,6 +78,7 @@ export interface VerdictResponse {
 
 export interface AppInput {
   assessedValue: number;
+  zipcode: string;
   neighborhood: string;
   comparisonNeighborhood: string;
 }
