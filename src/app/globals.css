@@ -1,23 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f9fafb;
-  --foreground: #171717;
+  --background: #EEF6FC;
+  --foreground: #1a2332;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-navy-50: #f0f4f8;
-  --color-navy-100: #d9e2ec;
-  --color-navy-200: #bcccdc;
-  --color-navy-300: #9fb3c8;
-  --color-navy-400: #829ab1;
-  --color-navy-500: #627d98;
-  --color-navy-600: #486581;
-  --color-navy-700: #334e68;
-  --color-navy-800: #243b53;
-  --color-navy-900: #102a43;
+
+  --color-sd-blue: #009CDE;
+  --color-sd-blue-light: #33B0E5;
+  --color-sd-blue-bright: #00AEEF;
+  --color-sd-navy: #003B5C;
+  --color-sd-navy-light: #0A5A80;
+  --color-sd-sky: #5DC3F0;
+  --color-sd-sky-light: #A8DEFA;
+  --color-sd-sky-pale: #DBF0FC;
+  --color-sd-baby: #7DD3F7;
+  --color-sd-gold: #FFC425;
+  --color-sd-gold-dark: #F2A900;
+  --color-sd-bg: #EEF6FC;
+  --color-sd-card: #FFFFFF;
+  --color-sd-text: #1a2332;
+  --color-sd-text-muted: #5a6b7f;
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

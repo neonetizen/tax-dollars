@@ -13,28 +13,31 @@ export function TaxReceipt() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
-      <div className="rounded-xl bg-white p-6 shadow-md">
-        <h2 className="mb-2 text-2xl font-bold text-navy-900">
-          Your San Diego Tax Receipt
-        </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-lg bg-gray-50 p-4 text-center">
-            <p className="text-sm text-gray-500">Assessed Value</p>
-            <p className="text-2xl font-bold text-navy-800">
-              ${taxBreakdown.assessedValue.toLocaleString()}
-            </p>
-          </div>
-          <div className="rounded-lg bg-gray-50 p-4 text-center">
-            <p className="text-sm text-gray-500">Base Property Tax (1%)</p>
-            <p className="text-2xl font-bold text-navy-800">
-              ${taxBreakdown.baseTax.toLocaleString()}
-            </p>
-          </div>
-          <div className="rounded-lg bg-gray-50 p-4 text-center">
-            <p className="text-sm text-gray-500">Your City Contribution</p>
-            <p className="text-2xl font-bold text-amber-600">
-              ${taxBreakdown.cityContribution.toFixed(2)}
-            </p>
+      <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
+        <div className="h-1.5 bg-gradient-to-r from-sd-navy via-sd-blue to-sd-sky" />
+        <div className="p-6 sm:p-8">
+          <h2 className="mb-6 text-2xl font-bold text-sd-navy sm:text-3xl">
+            Your San Diego Tax Receipt
+          </h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-xl bg-sd-bg p-5 text-center">
+              <p className="text-sm font-medium text-sd-text-muted">Assessed Value</p>
+              <p className="mt-1 text-2xl font-bold text-sd-navy">
+                ${taxBreakdown.assessedValue.toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded-xl bg-sd-bg p-5 text-center">
+              <p className="text-sm font-medium text-sd-text-muted">Base Property Tax (1%)</p>
+              <p className="mt-1 text-2xl font-bold text-sd-navy">
+                ${taxBreakdown.baseTax.toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded-xl bg-sd-gold/10 p-5 text-center ring-1 ring-sd-gold/30">
+              <p className="text-sm font-medium text-sd-gold-dark">Your City Contribution</p>
+              <p className="mt-1 text-2xl font-bold text-sd-gold-dark">
+                ${taxBreakdown.cityContribution.toFixed(2)}
+              </p>
+            </div>
           </div>
         </div>
       </div>

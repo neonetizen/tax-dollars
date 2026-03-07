@@ -1,6 +1,6 @@
 import type { CIPProject } from "@/types";
 
-interface CIPRow {
+export interface CIPRow {
   amount: number | string;
   project_number: string;
   report_fy: number | string;
@@ -11,20 +11,22 @@ interface CIPRow {
   [key: string]: unknown;
 }
 
-export function aggregateCIP(rows: CIPRow[]): Map<string, CIPProject[]> {
+export function aggregateCIP(rows: Record<string, unknown>[]): Map<string, CIPProject[]> {
   const deptMap = new Map<string, CIPProject[]>();
 
-  const fiscalYears = [...new Set(rows.map((r) => String(r.report_fy)))].sort();
+  const fiscalYears = [...new Set(rows.map((r) => String(r.report_fy ?? "")))].sort();
   const latestFY = fiscalYears[fiscalYears.length - 1];
 
-  for (const row of rows) {
+  for (const raw of rows) {
+    const row = raw as unknown as CIPRow;
+
     if (String(row.report_fy) !== latestFY) continue;
-    if (String(row.budget_cycle).toLowerCase() !== "adopted") continue;
+    if (String(row.budget_cycle ?? "").toLowerCase() !== "adopted") continue;
 
     const amount =
       typeof row.amount === "string"
         ? parseFloat(row.amount.replace(/,/g, ""))
-        : row.amount;
+        : Number(row.amount);
 
     if (isNaN(amount) || amount <= 0) continue;
 

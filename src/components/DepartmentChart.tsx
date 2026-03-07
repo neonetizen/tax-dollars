@@ -12,15 +12,15 @@ import {
 } from "recharts";
 
 const COLORS = [
-  "#1e3a5f",
-  "#2563eb",
-  "#d97706",
-  "#059669",
-  "#dc2626",
-  "#7c3aed",
-  "#db2777",
-  "#0891b2",
-  "#65a30d",
+  "#003366",
+  "#0085CA",
+  "#FFC425",
+  "#4DB8E8",
+  "#0A4D80",
+  "#F2A900",
+  "#339FD4",
+  "#B8E2F6",
+  "#5a6b7f",
 ];
 
 export function DepartmentChart({ departments }: DepartmentChartProps) {
@@ -50,33 +50,51 @@ export function DepartmentChart({ departments }: DepartmentChartProps) {
   ];
 
   return (
-    <div className="rounded-xl bg-white p-6 shadow-md">
-      <h3 className="mb-4 text-xl font-bold text-navy-900">
-        Department Breakdown
-      </h3>
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={chartData} layout="vertical" margin={{ left: 140 }}>
-          <XAxis
-            type="number"
-            tickFormatter={(v: number) => `$${v.toFixed(0)}`}
-          />
-          <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 12 }} />
-          <Tooltip
-            formatter={(value) => [
-              `$${Number(value).toFixed(2)}`,
-              "Your Contribution",
-            ]}
-          />
-          <Bar dataKey="amount" radius={[0, 4, 4, 0]}>
-            {chartData.map((_, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
+      <div className="h-1 bg-sd-blue" />
+      <div className="p-6 sm:p-8">
+        <h3 className="mb-6 text-xl font-bold text-sd-navy">
+          Where Your Dollars Go
+        </h3>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={chartData} layout="vertical" margin={{ left: 140 }}>
+            <XAxis
+              type="number"
+              tickFormatter={(v: number) => `$${v.toFixed(0)}`}
+              tick={{ fill: "#5a6b7f", fontSize: 12 }}
+              axisLine={{ stroke: "#E0F1FB" }}
+              tickLine={false}
+            />
+            <YAxis
+              type="category"
+              dataKey="name"
+              width={130}
+              tick={{ fill: "#003366", fontSize: 12, fontWeight: 500 }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip
+              formatter={(value) => [
+                `$${Number(value).toFixed(2)}`,
+                "Your Contribution",
+              ]}
+              contentStyle={{
+                borderRadius: "8px",
+                border: "1px solid #E0F1FB",
+                boxShadow: "0 4px 12px rgba(0,51,102,0.08)",
+              }}
+            />
+            <Bar dataKey="amount" radius={[0, 6, 6, 0]}>
+              {chartData.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
