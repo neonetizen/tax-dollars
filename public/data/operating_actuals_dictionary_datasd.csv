@@ -1,0 +1,8 @@
+field,description,possible_values
+amount,Amount spent,
+fund_type,Groups funds by general purpose,
+fund_number,Uniquely identifies the fund. Capital funds are preceded by the letter C in the data.,
+dept_name,Department name,
+funds_center_number,"Unique identifier for a funds center. A funds center represents the lowest level of organizational detail within a department and can represent a team, function, or facility within a department. Department group, name, division, and section represent groupings of funds centers.",
+account,"Describes the smallest subset of an account group, typically defined by a specific function, service, or item",
+account_number,Uniquely identifies an expense or revenue account. Revenue accounts begin with a 4 while expense accounts begin with a 5.,
