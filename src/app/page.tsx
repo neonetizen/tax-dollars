@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { AppProvider, useAppContext } from "@/context/AppContext";
+import { HeroHeader } from "@/components/HeroHeader";
 import { InputForm } from "@/components/InputForm";
 import { TaxReceipt } from "@/components/TaxReceipt";
 import type { TaxReceiptResponse, VerdictRequest } from "@/types";
@@ -93,35 +94,49 @@ function AppContent() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-12">
-      <header className="mb-12 text-center">
-        <h1 className="mb-2 text-4xl font-bold text-navy-900">
-          My Tax Dollars
-        </h1>
-        <p className="text-lg text-gray-600">
-          A receipt for your San Diego property taxes
-        </p>
-      </header>
+    <div className="flex min-h-screen flex-col bg-sd-bg">
+      <HeroHeader />
 
-      {state.error && (
-        <div className="mx-auto mb-8 max-w-lg rounded-lg bg-red-50 p-4 text-red-700">
-          {state.error}
+      <main className="mx-auto flex w-full max-w-4xl flex-1 items-center px-4 py-10">
+        <div className="w-full">
+          {!showReceipt && !receiptLoading && (
+            <div className="rounded-2xl bg-white p-6 shadow-xl sm:p-8">
+              {state.error && (
+                <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                  {state.error}
+                </div>
+              )}
+              <InputForm onSubmit={handleCalculate} />
+            </div>
+          )}
+
+          {receiptLoading && (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-sd-sky-light border-t-sd-blue" />
+              <p className="text-lg font-semibold text-sd-navy">
+                Crunching the numbers&hellip;
+              </p>
+            </div>
+          )}
+
+          {showReceipt && !receiptLoading && (
+            <>
+              <TaxReceipt />
+              <div className="mt-8 text-center">
+                <button
+                  onClick={() => {
+                    setShowReceipt(false);
+                    dispatch({ type: "SET_ERROR", payload: "" });
+                  }}
+                  className="rounded-lg border border-sd-blue/20 bg-white px-6 py-2.5 text-sm font-semibold text-sd-blue shadow-sm transition-all hover:bg-sd-bg hover:shadow-md"
+                >
+                  Calculate Again
+                </button>
+              </div>
+            </>
+          )}
         </div>
-      )}
-
-      <InputForm onSubmit={handleCalculate} />
-
-      {receiptLoading && (
-        <div className="mt-12 text-center text-gray-500">
-          Loading your receipt…
-        </div>
-      )}
-
-      {showReceipt && !receiptLoading && (
-        <div className="mt-12">
-          <TaxReceipt />
-        </div>
-      )}
+      </main>
     </div>
   );
 }
