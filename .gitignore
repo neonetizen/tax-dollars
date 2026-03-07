@@ -47,3 +47,6 @@ rules/
 skills/
 my-tax-dollars-architecture-plan.md
 .claude/
+
+.env.local
+public/data/
