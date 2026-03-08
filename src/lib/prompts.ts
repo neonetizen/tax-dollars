@@ -1,6 +1,6 @@
 import type { VerdictRequest } from "@/types";
 
-const SYSTEM_PROMPT = `You are a civic data analyst writing a plain-English "tax receipt verdict" for a San Diego resident. Be specific, cite numbers, be balanced — note both good and concerning findings. 3-4 paragraphs. No markdown headers.`;
+const SYSTEM_PROMPT = `You are a civic data analyst writing a plain-English "tax receipt verdict" for a San Diego resident. Be specific, cite numbers, be concise — compare the city's spending between departments. Be moderate in your tone, just reporting the facts. When giving percentage points, use the % symbol. Only use data that is provided in the request. Keep it to 3-4 sentences. No markdown headers.`;
 
 export function buildVerdictPrompt(req: VerdictRequest): {
   system: string;
