@@ -7,7 +7,6 @@ import type { InputFormProps } from "@/types";
 export function InputForm({ onSubmit }: InputFormProps) {
   const { dispatch } = useAppContext();
   const [valueInput, setValueInput] = useState("");
-  const [zipInput, setZipInput] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -22,50 +21,29 @@ export function InputForm({ onSubmit }: InputFormProps) {
 
     dispatch({
       type: "SET_INPUT",
-      payload: { assessedValue: parsed, zipCode: zipInput.trim() },
+      payload: { assessedValue: parsed },
     });
-    onSubmit(parsed, zipInput.trim());
+    onSubmit(parsed, "");
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <div>
-          <label
-            htmlFor="zipCode"
-            className="mb-1.5 block text-sm font-semibold text-sd-navy"
-          >
-            San Diego ZIP Code
-          </label>
-          <input
-            id="zipCode"
-            type="text"
-            inputMode="numeric"
-            maxLength={5}
-            value={zipInput}
-            onChange={(e) => setZipInput(e.target.value.replace(/\D/g, ""))}
-            placeholder="e.g. 92101"
-            className="w-full rounded-lg border border-gray-200 bg-sd-bg px-4 py-3 text-lg text-sd-navy transition-all placeholder:text-sd-text-muted/50 focus:border-sd-blue focus:bg-white focus:outline-none focus:ring-2 focus:ring-sd-blue/25"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="assessedValue"
-            className="mb-1.5 block text-sm font-semibold text-sd-navy"
-          >
-            Assessed Property Value ($)
-          </label>
-          <input
-            id="assessedValue"
-            type="text"
-            inputMode="numeric"
-            value={valueInput}
-            onChange={(e) => setValueInput(e.target.value)}
-            placeholder="e.g. 650,000"
-            className="w-full rounded-lg border border-gray-200 bg-sd-bg px-4 py-3 text-lg text-sd-navy transition-all placeholder:text-sd-text-muted/50 focus:border-sd-blue focus:bg-white focus:outline-none focus:ring-2 focus:ring-sd-blue/25"
-          />
-        </div>
+    <form onSubmit={handleSubmit} className="mx-auto max-w-sm space-y-6">
+      <div>
+        <label
+          htmlFor="assessedValue"
+          className="mb-1.5 block text-sm font-semibold text-sd-navy"
+        >
+          Assessed Property Value ($)
+        </label>
+        <input
+          id="assessedValue"
+          type="text"
+          inputMode="numeric"
+          value={valueInput}
+          onChange={(e) => setValueInput(e.target.value)}
+          placeholder="e.g. 650,000"
+          className="w-full rounded-lg border border-gray-200 bg-sd-bg px-4 py-3 text-lg text-sd-navy transition-all placeholder:text-sd-text-muted/50 focus:border-sd-blue focus:bg-white focus:outline-none focus:ring-2 focus:ring-sd-blue/25"
+        />
       </div>
 
       {error && (
