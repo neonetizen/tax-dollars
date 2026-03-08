@@ -42,7 +42,7 @@ export function TaxReceipt() {
         </div>
       </div>
 
-      <DepartmentChart departments={taxBreakdown.departments} />
+      <DepartmentChart departments={taxBreakdown.departments} cityContribution={taxBreakdown.cityContribution} />
 
       <VerdictPanel />
       <Disclaimer />
