@@ -69,4 +69,4 @@ Receipt UI (React, single page)
 
 ## Live Application
 
-_Link TBD after deployment._
+https://tax-dollars-inky.vercel.app
