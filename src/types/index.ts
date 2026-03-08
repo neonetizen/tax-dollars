@@ -97,4 +97,5 @@ export interface InputFormProps {
 
 export interface DepartmentChartProps {
   departments: DepartmentSpend[];
+  cityContribution: number;
 }
