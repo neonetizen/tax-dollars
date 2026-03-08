@@ -70,9 +70,3 @@ Receipt UI (React, single page)
 ## Live Application
 
 _Link TBD after deployment._
-
----
-
-## Demo Video
-
-_60-second walkthrough linked here._
